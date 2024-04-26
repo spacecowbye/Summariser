@@ -41,14 +41,27 @@ def append_to_google_doc(summary, service, doc_id):
 # Function to authenticate with Google Drive API
 
 def authenticate():
-    # Path to your service account key JSON file
-    key_path = 'credentials.json'
+    # Read the service account key JSON from Streamlit secrets
+    service_account_key = {
+        "type": st.secrets["credentials"]["type"],
+        "project_id": st.secrets["credentials"]["project_id"],
+        "private_key_id": st.secrets["credentials"]["private_key_id"],
+        "private_key": st.secrets["credentials"]["private_key"],
+        "client_email": st.secrets["credentials"]["client_email"],
+        "client_id": st.secrets["credentials"]["client_id"],
+        "auth_uri": st.secrets["credentials"]["auth_uri"],
+        "token_uri": st.secrets["credentials"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["credentials"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["credentials"]["client_x509_cert_url"]
+    }
 
-    # Create credentials using service account key file
-    credentials = service_account.Credentials.from_service_account_file(key_path, scopes=['https://www.googleapis.com/auth/drive'])
+    # Create credentials using service account key
+    credentials = service_account.Credentials.from_service_account_info(
+        info=service_account_key,
+        scopes=['https://www.googleapis.com/auth/drive']
+    )
 
     return credentials
-    
 
 # LLM pipeline
 
@@ -107,3 +120,5 @@ if st.button('Summarize'):
 
     # Create a Google Doc with the summary and insert it into the selected folder
     append_to_google_doc(summary, service, selected_folder_id)
+
+
